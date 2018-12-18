@@ -1,7 +1,8 @@
 $script = <<SCRIPT
 (
-rpm -i https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
-yum install -y -q autoconf automake btrfs-progs docker gettext-devel git libcgroup-tools libtool python-pip
+rpm -ivh https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-11.noarch.rpm
+yum update -y nss curl libcurl
+yum install -y -q autoconf automake btrfs-progs docker gettext-devel git libcgroup-tools libtool python-pip jq
 
 fallocate -l 10G ~/btrfs.img
 mkdir /var/bocker
@@ -13,7 +14,7 @@ systemctl start docker.service
 docker pull centos
 docker save centos | undocker -o base-image
 
-git clone https://github.com/karelzak/util-linux.git
+git clone --branch v2.25.2 --depth 1 https://github.com/karelzak/util-linux.git
 cd util-linux
 git checkout tags/v2.25.2
 ./autogen.sh
@@ -21,6 +22,9 @@ git checkout tags/v2.25.2
 make
 mv unshare /usr/bin/unshare
 cd ..
+
+curl -sL https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh -o /usr/bin/download-frozen-image-v2
+chmod +x /usr/bin/download-frozen-image-v2
 
 ln -s /vagrant/bocker /usr/bin/bocker
 
